@@ -4,15 +4,140 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using Dapper;
 
 namespace TaskManagerProto
 {
+
     public class DBmanager
     {
-        static string connectionString = "Server=DESKTOP-E34B530\\SQLEXPRESS;Database=TODOTaskManager;Trusted_Connection=True;";
 
-        public static IEnumerable<Task> GetTasks() 
+        static string connectionString = "";
+        static string dbName = "TODOTaskManager";
+        static string serverName = "localhost\\SQLEXPRESS";
+        public static void Connection() 
+        {
+            try
+            {;
+                string NewconnectionString = $"Server={serverName};Integrated Security=True;";
+
+                if (DatabaseExists(serverName, dbName, NewconnectionString))
+                {
+                    connectionString = $"Server={serverName};Database={dbName};Trusted_Connection=True;";
+                }
+                else
+                {
+                    MessageBox.Show($"База данных '{dbName}' НЕ найдена. Создаю...");
+                    connectionString = $"Server={serverName};Integrated Security=True;";
+                    CreateFullyDataBase();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+        }
+        public static void CreateFullyDataBase()
+        {
+            CreateDatabse();
+            CreateTables();
+            AlterTables();
+            InsertIntoTables();
+            connectionString = $"Server={serverName};Database={dbName};Trusted_Connection=True;";
+        }
+        public static void CreateDatabse()
+        {
+            using (var connection = new SqlConnection(connectionString))
+            {
+                string query = $"CREATE DATABASE {dbName};";
+                connection.Execute(query);
+            }
+        }
+
+        public static void CreateTables() 
+        {
+            using (var connection = new SqlConnection(connectionString))
+            {
+                string query = "USE TODOTaskManager " +
+                    $"CREATE TABLE Task( " +
+                    $"ID int PRIMARY KEY IDENTITY (1,1)," +
+                    $"TaskName NVARCHAR(100) NOT NULL," +
+                    $"TaskDescription NVARCHAR(500) NOT NULL," +
+                    $"StatusID INT," +
+                    $"TypeID INT," +
+                    $"StartDate DateTime NOT NULL," +
+                    $"Deadline DateTime NULL," +
+                    $"Priortiy INT NOT NULL); " +
+                    $"CREATE TABLE Task_Status(" +
+                    $"ID INT PRIMARY KEY IDENTITY (1,1)," +
+                    $"Name NVARCHAR(20) NOT NULL,); " +
+                    $"CREATE TABLE Task_Type(" +
+                    $"ID INT PRIMARY KEY IDENTITY (1,1)," +
+                    $"Name NVARCHAR(20) NOT NULL,); ";
+                connection.Execute(query);
+            }
+        }
+
+        public static void AlterTables()
+        {
+            using (var connection = new SqlConnection(connectionString))
+            {
+                string query = "USE TODOTaskManager " +
+                    "ALTER TABLE Task " +
+                    "ADD FOREIGN KEY (StatusID) REFERENCES Task_Status(ID) " +
+                    "ON DELETE CASCADE " +
+                    "ON UPDATE SET NULL; " +
+                    "ALTER TABLE Task " +
+                    "ADD FOREIGN KEY (TypeID) REFERENCES Task_Type(ID) " +
+                    "ON DELETE CASCADE" +
+                    "ON UPDATE SET NULL;";
+                connection.Execute(query);
+            }
+        }
+
+        public static void InsertIntoTables()
+        {
+            using (var connection = new SqlConnection(connectionString))
+            {
+                string query = "USE TODOTaskManager " +
+                    "INSERT INTO Task_Status (Name) " +
+                    "VALUES ('Новая'),('В процессе'),('Готова'); " +
+                    "INSERT INTO Task_Type (Name) " +
+                    "VALUES ('Работа'),('Дом'),('Личное'); ";
+                connection.Execute(query);
+            }
+        }
+
+        public static bool DatabaseExists(string server, string dbName, string masterConnectionString)
+        {
+            string query = $"SELECT db_id('{dbName}') AS DatabaseID;";
+
+            using (SqlConnection connection = new SqlConnection(masterConnectionString))
+            {
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    try
+                    {
+                        connection.Open();
+                        object result = command.ExecuteScalar();
+                        if (result != DBNull.Value)
+                        {
+                            int dbId = Convert.ToInt32(result);
+                            return dbId > 0;
+                        }
+                        return false;
+                    }
+                    catch (SqlException ex)
+                    {
+                        MessageBox.Show($"Ошибка при проверке базы данных: {ex.Message}");
+                        return false;
+                    }
+                }
+            }
+        }
+
+        public static IEnumerable<Task> GetTasks()
         {
             using (var connection = new SqlConnection(connectionString))
             {
@@ -35,8 +160,15 @@ namespace TaskManagerProto
             {
                 string query = "INSERT INTO Task (TaskName, TaskDescription, StatusID, TypeID, StartDate, DeadLine , Priority) " +
                     "VALUES (@TaskName, @TaskDescription, @StatusID, @TypeID, @StartDate, @DeadLine , @Priority)";
-                connection.Execute(query, new { TaskName = taskName, TaskDescription = taskDescription, StatusID = statusID, TypeID = typeID, 
-                    StartDate = startDate, DeadLine = deadLine, Priority = priority });
+                connection.Execute(query, new 
+                { 
+                    TaskName = taskName, 
+                    TaskDescription = taskDescription,
+                    StatusID = statusID, 
+                    TypeID = typeID,
+                    StartDate = startDate, 
+                    DeadLine = deadLine, 
+                    Priority = priority });
             }
         }
 
@@ -123,7 +255,5 @@ namespace TaskManagerProto
                 return connection.Query<Task_Type>("SELECT * FROM Task_Type");
             }
         }
-
-
     }
 }

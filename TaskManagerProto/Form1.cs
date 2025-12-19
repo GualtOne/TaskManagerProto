@@ -21,6 +21,7 @@ namespace TaskManagerProto
 
         public Form1()
         {
+            DBmanager.Connection();
             InitializeComponent();
             InitializeTaskListView();
             this.Text = "Менеджер задач";
@@ -154,15 +155,21 @@ namespace TaskManagerProto
         private ContextMenuStrip CreateContextMenu()
         {
             ContextMenuStrip contextMenu = new ContextMenuStrip();
+            ToolStripMenuItem QuickItem = new ToolStripMenuItem("Быстрые действия");
             ToolStripMenuItem Edititem = new ToolStripMenuItem("Редактировать задачу");
             ToolStripMenuItem DeleteItem = new ToolStripMenuItem("Удалить задачу");
             ToolStripMenuItem ShowDesc = new ToolStripMenuItem("Показать описание");
+
+            ToolStripMenuItem StatusUP = new ToolStripMenuItem("Следующий статус");
+            ToolStripMenuItem PriorityUP = new ToolStripMenuItem("Следующий приоритет");
+
+            QuickItem.DropDown.Items.AddRange(new ToolStripItem[] { StatusUP, PriorityUP });
 
             Edititem.Click += (s, e) => EditSelectedItem();
             DeleteItem.Click += (s, e) => DeleteSelectedTask();
             ShowDesc.Click += (s, e) => ShowTaskDesc();
 
-            contextMenu.Items.AddRange(new ToolStripItem[] { Edititem, DeleteItem, ShowDesc });
+            contextMenu.Items.AddRange(new ToolStripItem[] { QuickItem, Edititem, DeleteItem, ShowDesc });
             return contextMenu;
         }
 
@@ -181,8 +188,6 @@ namespace TaskManagerProto
                     {
                         ListViewItem item = new ListViewItem(task.ID.ToString());
                         item.SubItems.Add(task.TaskName);
-
-                        // Получаем имена статуса и типа
                         string statusName = DBmanager.GetTaskStatusName(task.StatusID);
                         string typeName = DBmanager.GetTaskTypeName(task.TypeID);
 

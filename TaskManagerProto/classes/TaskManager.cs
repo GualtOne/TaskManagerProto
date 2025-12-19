@@ -38,6 +38,8 @@ namespace TaskManagerProto
             InitializeComponent();
             IsEditMode = false;
             this.Text = "Добавить задачу";
+            saveButton.Text = "Добавить задачу";
+            saveButton.BackColor = Color.LightGreen;
             LoadData();
         }
 
@@ -46,6 +48,8 @@ namespace TaskManagerProto
             IsEditMode = true;
             TaskId = taskId;
             this.Text = "Изменить задачу";
+            saveButton.Text = "Сохранить изменения";
+            saveButton.BackColor = Color.LightBlue;
             LoadTaskData(taskId);
         }
 
@@ -159,10 +163,8 @@ namespace TaskManagerProto
 
             saveButton = new Button()
             {
-                Text = IsEditMode ? "Сохранить изменения" : "Добавить задачу",
                 Height = 40,
                 Dock = DockStyle.Bottom,
-                BackColor = IsEditMode ? Color.LightBlue : Color.LightGreen,
                 Margin = new Padding(5, 10, 5, 5)
             };
 
@@ -183,8 +185,8 @@ namespace TaskManagerProto
             };
 
             mainPanel.Controls.AddRange(new Control[] {
-                cancelButton,
                 saveButton,
+                cancelButton,
                 dateTimePicker, deadlineLabel,
                 priorityComboBox, priorityLabel,
                 typeComboBox, typeLabel,
@@ -278,6 +280,7 @@ namespace TaskManagerProto
 
         private bool ValidateForm()
         {
+
             if (string.IsNullOrEmpty(nameBox.Text.Trim()))
             {
                 MessageBox.Show("Имя задачи не может быть пустым", "Ошибка",
@@ -285,6 +288,25 @@ namespace TaskManagerProto
                 nameBox.Focus();
                 return false;
             }
+
+            int namelenght = nameBox.Text.Length;
+            if (namelenght > 100)
+            {
+                MessageBox.Show($"Достигнут лимит символов в имени: 100 у вас {namelenght}", "Ошибка",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                nameBox.Focus();
+                return false;
+            }
+
+            int desclenght = descriptionBox.Text.Length;
+            if (desclenght > 500) 
+            {
+                MessageBox.Show($"Достигнут лимит символов в описании: 500 у вас {desclenght}", "Ошибка",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                descriptionBox.Focus();
+                return false;
+            }
+
 
             if (statusComboBox.SelectedItem == null)
             {
@@ -331,5 +353,10 @@ namespace TaskManagerProto
             }
             return Priority.Low;
         }
+    }
+
+    public class Sorter
+    {
+
     }
 }
