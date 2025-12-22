@@ -9,14 +9,12 @@ using Dapper;
 
 namespace TaskManagerProto
 {
-
     public class DBmanager
     {
-
         static string connectionString = "";
         static string dbName = "TODOTaskManager";
         static string serverName = "localhost\\SQLEXPRESS";
-        public static void Connection() 
+        public static void Connection()
         {
             try
             {;
@@ -33,9 +31,9 @@ namespace TaskManagerProto
                     CreateFullyDataBase();
                 }
             }
-            catch (Exception ex)
+            catch (SqlException ex)
             {
-                MessageBox.Show(ex.ToString());
+                MessageBox.Show($"Ошибка при при подсоединение к SQL серверу {ex.Message}");
             }
         }
         public static void CreateFullyDataBase()
@@ -45,54 +43,77 @@ namespace TaskManagerProto
             AlterTables();
             InsertIntoTables();
             connectionString = $"Server={serverName};Database={dbName};Trusted_Connection=True;";
+            Connection();
         }
         public static void CreateDatabse()
         {
-            using (var connection = new SqlConnection(connectionString))
+            try
             {
-                string query = $"CREATE DATABASE {dbName};";
-                connection.Execute(query);
+                using (var connection = new SqlConnection(connectionString))
+                {
+                    string query = $"CREATE DATABASE {dbName};";
+                    connection.Execute(query);
+                }
+            }
+            catch (SqlException ex)
+            {
+                MessageBox.Show($"Ошибка при создание базы данных {ex.Message}");
             }
         }
 
         public static void CreateTables() 
         {
-            using (var connection = new SqlConnection(connectionString))
+            try
             {
-                string query = "USE TODOTaskManager " +
-                    $"CREATE TABLE Task( " +
-                    $"ID int PRIMARY KEY IDENTITY (1,1)," +
-                    $"TaskName NVARCHAR(100) NOT NULL," +
-                    $"TaskDescription NVARCHAR(500) NOT NULL," +
-                    $"StatusID INT," +
-                    $"TypeID INT," +
-                    $"StartDate DateTime NOT NULL," +
-                    $"Deadline DateTime NULL," +
-                    $"Priortiy INT NOT NULL); " +
-                    $"CREATE TABLE Task_Status(" +
-                    $"ID INT PRIMARY KEY IDENTITY (1,1)," +
-                    $"Name NVARCHAR(20) NOT NULL,); " +
-                    $"CREATE TABLE Task_Type(" +
-                    $"ID INT PRIMARY KEY IDENTITY (1,1)," +
-                    $"Name NVARCHAR(20) NOT NULL,); ";
-                connection.Execute(query);
+                using (var connection = new SqlConnection(connectionString))
+                {
+                    string query = $"USE {dbName} " +
+                        $"CREATE TABLE Task( " +
+                        $"ID int PRIMARY KEY IDENTITY (1,1)," +
+                        $"TaskName NVARCHAR(100) NOT NULL," +
+                        $"TaskDescription NVARCHAR(500) NOT NULL," +
+                        $"StatusID INT," +
+                        $"TypeID INT," +
+                        $"StartDate DateTime NOT NULL," +
+                        $"Deadline DateTime NULL," +
+                        $"Priortiy INT NOT NULL); " +
+                        $"CREATE TABLE Task_Status(" +
+                        $"ID INT PRIMARY KEY IDENTITY (1,1)," +
+                        $"Name NVARCHAR(20) NOT NULL,); " +
+                        $"CREATE TABLE Task_Type(" +
+                        $"ID INT PRIMARY KEY IDENTITY (1,1)," +
+                        $"Name NVARCHAR(20) NOT NULL,); ";
+                    connection.Execute(query);
+                }
             }
+            catch (SqlException ex)
+            {
+                MessageBox.Show($"Ошибка при создание таблиц {ex.Message}");
+            }
+
         }
 
         public static void AlterTables()
         {
-            using (var connection = new SqlConnection(connectionString))
+            try
             {
-                string query = "USE TODOTaskManager " +
-                    "ALTER TABLE Task " +
-                    "ADD FOREIGN KEY (StatusID) REFERENCES Task_Status(ID) " +
-                    "ON DELETE CASCADE " +
-                    "ON UPDATE SET NULL; " +
-                    "ALTER TABLE Task " +
-                    "ADD FOREIGN KEY (TypeID) REFERENCES Task_Type(ID) " +
-                    "ON DELETE CASCADE" +
-                    "ON UPDATE SET NULL;";
-                connection.Execute(query);
+                using (var connection = new SqlConnection(connectionString))
+                {
+                    string query = $"USE {dbName} " +
+                        "ALTER TABLE Task " +
+                        "ADD FOREIGN KEY (StatusID) REFERENCES Task_Status(ID) " +
+                        "ON DELETE CASCADE " +
+                        "ON UPDATE SET NULL; " +
+                        "ALTER TABLE Task " +
+                        "ADD FOREIGN KEY (TypeID) REFERENCES Task_Type(ID) " +
+                        "ON DELETE CASCADE" +
+                        "ON UPDATE SET NULL;";
+                    connection.Execute(query);
+                }
+            }
+            catch (SqlException ex)
+            {
+                MessageBox.Show($"Ошибка при изменеине таблиц базы данных {ex.Message}");
             }
         }
 
@@ -100,7 +121,7 @@ namespace TaskManagerProto
         {
             using (var connection = new SqlConnection(connectionString))
             {
-                string query = "USE TODOTaskManager " +
+                string query = $"USE {dbName} " +
                     "INSERT INTO Task_Status (Name) " +
                     "VALUES ('Новая'),('В процессе'),('Готова'); " +
                     "INSERT INTO Task_Type (Name) " +

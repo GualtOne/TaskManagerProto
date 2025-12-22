@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Dapper;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -18,6 +19,7 @@ namespace TaskManagerProto
         private ToolStripStatusLabel statusLabel;
         private Panel panel;
         private ToolStrip toolStrip;
+        private ListViewItem item;
 
         public Form1()
         {
@@ -39,6 +41,8 @@ namespace TaskManagerProto
             panel.Controls.Add(taskListView);
             InitializeToolstrip();
             RefreshTaskList();
+            CheckDeadlineExpired();
+            CheckDeadlineToday();
         }
 
         private void InitializeToolstrip()
@@ -58,10 +62,53 @@ namespace TaskManagerProto
                 Text = "Добавить задачу",
                 ToolTipText = "Открывает окно создания задачи"
             };
+
+            ToolStripDropDown dropDown = new ToolStripDropDown();
+            ToolStripDropDownButton chckdl = new ToolStripDropDownButton()
+            {
+                Text = "Дедлайны",
+                ToolTipText = "Проверяет дедлайном задач",
+                DropDown = dropDown,
+                DropDownDirection = ToolStripDropDownDirection.Default,
+                Height = 100,
+                Width = 100,
+            };
+
+            ToolStripButton chckdltoday = new ToolStripButton()
+            {
+                Text = "Сегодня",
+                ToolTipText = "Проверяет наличие задач с дедлайном сегодня",
+            };
+
+            ToolStripButton chckdlexpired = new ToolStripButton()
+            {
+                Text = "Просроченные",
+                ToolTipText = "Проверяет наличие задач с просроченым дедлайном",
+            };
+
+            chckdl.DropDown.Items.Add(chckdltoday);
+            chckdl.DropDown.Items.Add(chckdlexpired);
+
+            //удали это если не надо
+            ToolStripButton testd = new ToolStripButton()
+           {
+               Text = "DEADLINE",
+               ToolTipText = ""
+           };
+
             addbtn.Click += (s, e) => AddTaskWindow();
+            chckdltoday.Click += (s, e) => CheckDeadlineToday();
+            chckdlexpired.Click += (s, e) => CheckDeadlineExpired();
+            testd.Click += (s, e) => DEADLINE();
             panel.Controls.Add(toolStrip);
-            toolStrip.Items.AddRange(new ToolStripItem[] { addbtn, filterbtn });
+            toolStrip.Items.AddRange(new ToolStripItem[] { addbtn, filterbtn, chckdl, testd });
         }
+
+        private void DEADLINE()
+        {
+            MessageBox.Show(taskListView.Items[0].Text);
+        }
+
 
         private void AddTaskWindow()
         {
@@ -186,7 +233,7 @@ namespace TaskManagerProto
                 {
                     try
                     {
-                        ListViewItem item = new ListViewItem(task.ID.ToString());
+                        item = new ListViewItem(task.ID.ToString());
                         item.SubItems.Add(task.TaskName);
                         string statusName = DBmanager.GetTaskStatusName(task.StatusID);
                         string typeName = DBmanager.GetTaskTypeName(task.TypeID);
@@ -196,7 +243,6 @@ namespace TaskManagerProto
                         item.SubItems.Add(task.Priority.ToString());
                         item.SubItems.Add(task.StartDate.ToString("dd.MM.yyyy HH:mm"));
                         item.SubItems.Add(task.DeadLine?.ToString("dd.MM.yyyy HH:mm") ?? "Нет");
-
                         item.Tag = task;
                         taskListView.Items.Add(item);
                     }
@@ -313,6 +359,62 @@ namespace TaskManagerProto
                 return taskListView.SelectedItems[0].Tag as Task;
             }
             return null;
+        }
+
+        private void Sort()
+        {
+        }
+
+        private void CheckDeadlineToday()
+        {
+            try
+            {
+                List<string> dla = new List<string>();
+                for (int i = 0; i < taskListView.Items.Count; i++)
+                {
+                    DateTime deadline = Convert.ToDateTime(taskListView.Items[i].SubItems[6].Text);
+                    if (deadline.Day == DateTime.Now.Day)
+                    {
+                        dla.Add(taskListView.Items[i].SubItems[1].Text);
+                    }
+                }
+                if (dla.Count > 0)
+                {    
+                    string resualt = $"Сегодня дедланй у задачи/задач {string.Join("; ", dla)}.";
+                    MessageBox.Show(resualt, "Дедлайны");
+                }
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message);
+            }
+        }
+
+        private void CheckDeadlineExpired()
+        {
+            try
+            {
+                List<int> dla = new List<int>();
+                for (int i = 0; i < taskListView.Items.Count; i++)
+                {
+                    DateTime deadline = Convert.ToDateTime(taskListView.Items[i].SubItems[6].Text);
+                    if (deadline < DateTime.Now && deadline.Day != DateTime.Now.Day)
+                    {
+                        dla.Add(i);
+                    }
+                }
+                if (dla.Count > 0)
+                {
+                    foreach (int item in dla)
+                    {
+                        taskListView.Items[item].BackColor = Color.Red;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message);
+            }
         }
     }
 }

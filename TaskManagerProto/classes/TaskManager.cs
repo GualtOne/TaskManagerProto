@@ -30,14 +30,14 @@ namespace TaskManagerProto
         public string SelectedPriority => priorityComboBox.SelectedItem?.ToString();
         public DateTime? Deadline => dateTimePicker.Value;
 
-        public bool IsEditMode { get; private set; }
+        public bool IsEditMode { get; set; }
         public int TaskId { get; private set; }
 
         public TaskManager()
         {
             InitializeComponent();
             IsEditMode = false;
-            this.Text = "Добавить задачу";
+            Text = "Добавить задачу";
             saveButton.Text = "Добавить задачу";
             saveButton.BackColor = Color.LightGreen;
             LoadData();
@@ -47,7 +47,7 @@ namespace TaskManagerProto
         {
             IsEditMode = true;
             TaskId = taskId;
-            this.Text = "Изменить задачу";
+            Text = "Изменить задачу";
             saveButton.Text = "Сохранить изменения";
             saveButton.BackColor = Color.LightBlue;
             LoadTaskData(taskId);
@@ -55,15 +55,15 @@ namespace TaskManagerProto
 
         private void InitializeComponent()
         {
-            this.Size = new Size(350, 500);
-            this.StartPosition = FormStartPosition.CenterScreen;
-            this.FormBorderStyle = FormBorderStyle.FixedDialog;
-            this.MaximizeBox = false;
-            this.MinimizeBox = false;
+            Size = new Size(350, 500);
+            StartPosition = FormStartPosition.CenterScreen;
+            FormBorderStyle = FormBorderStyle.FixedDialog;
+            MaximizeBox = false;
+            MinimizeBox = false;
 
             mainPanel = new Panel();
             mainPanel.Dock = DockStyle.Fill;
-            this.Controls.Add(mainPanel);
+            Controls.Add(mainPanel);
 
             nameLabel = new Label()
             {
@@ -180,8 +180,8 @@ namespace TaskManagerProto
 
             cancelButton.Click += (s, e) =>
             {
-                this.DialogResult = DialogResult.Cancel;
-                this.Close();
+                DialogResult = DialogResult.Cancel;
+                Close();
             };
 
             mainPanel.Controls.AddRange(new Control[] {
@@ -280,7 +280,6 @@ namespace TaskManagerProto
 
         private bool ValidateForm()
         {
-
             if (string.IsNullOrEmpty(nameBox.Text.Trim()))
             {
                 MessageBox.Show("Имя задачи не может быть пустым", "Ошибка",
@@ -288,25 +287,6 @@ namespace TaskManagerProto
                 nameBox.Focus();
                 return false;
             }
-
-            int namelenght = nameBox.Text.Length;
-            if (namelenght > 100)
-            {
-                MessageBox.Show($"Достигнут лимит символов в имени: 100 у вас {namelenght}", "Ошибка",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                nameBox.Focus();
-                return false;
-            }
-
-            int desclenght = descriptionBox.Text.Length;
-            if (desclenght > 500) 
-            {
-                MessageBox.Show($"Достигнут лимит символов в описании: 500 у вас {desclenght}", "Ошибка",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                descriptionBox.Focus();
-                return false;
-            }
-
 
             if (statusComboBox.SelectedItem == null)
             {
@@ -353,10 +333,5 @@ namespace TaskManagerProto
             }
             return Priority.Low;
         }
-    }
-
-    public class Sorter
-    {
-
     }
 }
