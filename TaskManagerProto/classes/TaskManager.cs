@@ -288,6 +288,22 @@ namespace TaskManagerProto
                 return false;
             }
 
+            if (nameBox.Text.Trim().Length > 100) 
+            {
+                MessageBox.Show($"Имя задачи не может быть длинее 100, Длина имени задачи: {nameBox.Text.Trim().Length}", "Ошибка",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                nameBox.Focus();
+                return false;
+            }
+
+            if (nameBox.Text.Trim().Length > 500)
+            {
+                MessageBox.Show($"Описание задачи не может быть длинее 500, Длина описания задачи: {descriptionBox.Text.Trim().Length}", "Ошибка",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                nameBox.Focus();
+                return false;
+            }
+
             if (statusComboBox.SelectedItem == null)
             {
                 MessageBox.Show("Выберите статус задачи", "Ошибка",

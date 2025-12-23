@@ -41,7 +41,6 @@ namespace TaskManagerProto
             panel.Controls.Add(taskListView);
             InitializeToolstrip();
             RefreshTaskList();
-            CheckDeadlineExpired();
             CheckDeadlineToday();
         }
 
@@ -52,23 +51,49 @@ namespace TaskManagerProto
                 Dock = DockStyle.Top
 
             };
+
+            ToolStripDropDown dropDownfilter = new ToolStripDropDown();
             ToolStripDropDownButton filterbtn = new ToolStripDropDownButton()
             {
                 Text = "Фильтр",
-                ToolTipText = "Выбор способа сортировки"
+                ToolTipText = "Выбор способа сортировки",
+                DropDown = dropDownfilter,
+                DropDownDirection = ToolStripDropDownDirection.Default,
+                Height = 100,
+                Width = 100,
             };
+
+            ToolStripButton sortbyid = new ToolStripButton()
+            {
+                Text = "По ID",
+                ToolTipText = "Сортирует по ID",
+                Dock = DockStyle.Fill,
+            };
+
+            ToolStripButton sortbystatus = new ToolStripButton()
+            {
+                Text = "По проритету",
+                ToolTipText = "Сортирует по проритету",
+                Dock = DockStyle.Fill,
+            };
+
+            filterbtn.DropDown.Items.Add(sortbystatus);
+            filterbtn.DropDown.Items.Add(sortbyid);
+
             ToolStripButton addbtn = new ToolStripButton()
             {
                 Text = "Добавить задачу",
                 ToolTipText = "Открывает окно создания задачи"
             };
 
-            ToolStripDropDown dropDown = new ToolStripDropDown();
+
+            ToolStripDropDown dropDownDeaadline = new ToolStripDropDown();
+
             ToolStripDropDownButton chckdl = new ToolStripDropDownButton()
             {
                 Text = "Дедлайны",
                 ToolTipText = "Проверяет дедлайном задач",
-                DropDown = dropDown,
+                DropDown = dropDownDeaadline,
                 DropDownDirection = ToolStripDropDownDirection.Default,
                 Height = 100,
                 Width = 100,
@@ -78,12 +103,14 @@ namespace TaskManagerProto
             {
                 Text = "Сегодня",
                 ToolTipText = "Проверяет наличие задач с дедлайном сегодня",
+                Dock = DockStyle.Fill,
             };
 
             ToolStripButton chckdlexpired = new ToolStripButton()
             {
                 Text = "Просроченные",
                 ToolTipText = "Проверяет наличие задач с просроченым дедлайном",
+                Dock = DockStyle.Fill,
             };
 
             chckdl.DropDown.Items.Add(chckdltoday);
@@ -96,6 +123,9 @@ namespace TaskManagerProto
                ToolTipText = ""
            };
 
+            sortbystatus.Click += (s, e) => SortByPriority();
+            sortbyid.Click += (s, e) => RefreshTaskList();
+
             addbtn.Click += (s, e) => AddTaskWindow();
             chckdltoday.Click += (s, e) => CheckDeadlineToday();
             chckdlexpired.Click += (s, e) => CheckDeadlineExpired();
@@ -106,7 +136,15 @@ namespace TaskManagerProto
 
         private void DEADLINE()
         {
-            MessageBox.Show(taskListView.Items[0].Text);
+            Task selectedTask = GetSelectedTask();
+            if (selectedTask != null)
+            {
+                MessageBox.Show((selectedTask.StatusID + 1).ToString());
+            }
+            else 
+            {
+                MessageBox.Show("bruh");
+            }
         }
 
 
@@ -216,6 +254,9 @@ namespace TaskManagerProto
             DeleteItem.Click += (s, e) => DeleteSelectedTask();
             ShowDesc.Click += (s, e) => ShowTaskDesc();
 
+            StatusUP.Click += (s, e) => NextStatus();
+            PriorityUP.Click += (s, e) => NextPriority();
+
             contextMenu.Items.AddRange(new ToolStripItem[] { QuickItem, Edititem, DeleteItem, ShowDesc });
             return contextMenu;
         }
@@ -253,6 +294,7 @@ namespace TaskManagerProto
                 }
 
                 statusLabel.Text = $"Всего задач: {tasks.Count} | Последнее обновление: {DateTime.Now:HH:mm:ss}";
+                CheckDeadlineExpired();
             }
             catch (Exception ex)
             {
@@ -361,9 +403,125 @@ namespace TaskManagerProto
             return null;
         }
 
-        private void Sort()
+        private void SortByPriority()
         {
+            int listcountview = taskListView.Items.Count;
+            if (listcountview > 0) 
+            {
+                for (int i = 0; i < listcountview; i++) 
+                {
+                    try
+                    {
+                        taskListView.BeginUpdate();
+                        taskListView.Items.Clear();
+
+                        var tasks = DBmanager.GetTasks().ToList().OrderByDescending(p => p.Priority);
+
+                        foreach (var task in tasks)
+                        {
+                            try
+                            {
+                                item = new ListViewItem(task.ID.ToString());
+                                item.SubItems.Add(task.TaskName);
+                                string statusName = DBmanager.GetTaskStatusName(task.StatusID);
+                                string typeName = DBmanager.GetTaskTypeName(task.TypeID);
+
+                                item.SubItems.Add(string.IsNullOrEmpty(statusName) ? "Не указан" : statusName);
+                                item.SubItems.Add(string.IsNullOrEmpty(typeName) ? "Не указан" : typeName);
+                                item.SubItems.Add(task.Priority.ToString());
+                                item.SubItems.Add(task.StartDate.ToString("dd.MM.yyyy HH:mm"));
+                                item.SubItems.Add(task.DeadLine?.ToString("dd.MM.yyyy HH:mm") ?? "Нет");
+                                item.Tag = task;
+                                taskListView.Items.Add(item);
+                            }
+                            catch (Exception ex)
+                            {
+                                Debug.WriteLine($"Ошибка при добавлении задачи в список: {ex.Message}");
+                            }
+                        }
+                        CheckDeadlineExpired();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Ошибка при обновлении списка задач: {ex.Message}", "Ошибка",
+                            MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                    finally
+                    {
+                        taskListView.EndUpdate();
+                    }
+                }
+            }
         }
+
+        private void NextStatus()
+        {
+            Task selectedTask = GetSelectedTask();
+            if (selectedTask != null)
+            {
+                string status = DBmanager.GetTaskStatusName(selectedTask.StatusID);
+                try
+                {
+                    switch (status)
+                    {
+                        case "Новая":
+                            DBmanager.UpdateStatus(selectedTask.ID, selectedTask.StatusID + 1);
+                            break;
+                        case "В процессе":
+                            DBmanager.UpdateStatus(selectedTask.ID, selectedTask.StatusID + 1);
+                            break;
+                        case "Готово":
+                            DBmanager.UpdateStatus(selectedTask.ID, selectedTask.StatusID - 2);
+                            break;
+                    }
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show(e.Message);
+                }
+            }
+            else 
+            {
+                MessageBox.Show("Выберите задачу для изменения.", "Информация",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            RefreshTaskList();
+        }
+        
+        private void NextPriority()
+        {
+            Task selectedTask = GetSelectedTask();
+            if (selectedTask != null)
+            {
+                Priority priority = selectedTask.Priority;
+                try
+                {
+                    switch (priority)
+                    {
+                        case Priority.Low:
+                            DBmanager.UpdatePriority(selectedTask.ID, Priority.Medium);
+                            break;
+                        case Priority.Medium:
+                            DBmanager.UpdatePriority(selectedTask.ID, Priority.High);
+                            break;
+                        case Priority.High:
+                            DBmanager.UpdatePriority(selectedTask.ID, Priority.Low);
+                            break;
+                    }
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show(e.Message);
+                }
+            }
+            else
+            {
+                MessageBox.Show("Выберите задачу для изменения.", "Информация",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            RefreshTaskList();
+        }
+
 
         private void CheckDeadlineToday()
         {

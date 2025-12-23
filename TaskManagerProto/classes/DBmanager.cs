@@ -76,7 +76,7 @@ namespace TaskManagerProto
                         $"TypeID INT," +
                         $"StartDate DateTime NOT NULL," +
                         $"Deadline DateTime NULL," +
-                        $"Priortiy INT NOT NULL); " +
+                        $"Priority INT NOT NULL); " +
                         $"CREATE TABLE Task_Status(" +
                         $"ID INT PRIMARY KEY IDENTITY (1,1)," +
                         $"Name NVARCHAR(20) NOT NULL,); " +
@@ -123,7 +123,7 @@ namespace TaskManagerProto
             {
                 string query = $"USE {dbName} " +
                     "INSERT INTO Task_Status (Name) " +
-                    "VALUES ('Новая'),('В процессе'),('Готова'); " +
+                    "VALUES ('Новая'),('В процессе'),('Готово'); " +
                     "INSERT INTO Task_Type (Name) " +
                     "VALUES ('Работа'),('Дом'),('Личное'); ";
                 connection.Execute(query);
@@ -276,5 +276,33 @@ namespace TaskManagerProto
                 return connection.Query<Task_Type>("SELECT * FROM Task_Type");
             }
         }
+
+        public static void UpdatePriority(int ID, Priority priority)
+        {
+            using (var connection = new SqlConnection(connectionString))
+            {
+                string query = "UPDATE Task SET Priority = @Priority WHERE ID = @ID";
+                connection.Execute(query, new
+                {
+                    Priority = priority,
+                    ID = ID
+                });
+            }
+        }
+
+
+        public static void UpdateStatus(int ID, int statusID)
+        {
+            using (var connection = new SqlConnection(connectionString))
+            {
+                string query = "UPDATE Task SET StatusID = @StatusID WHERE ID = @ID";
+                connection.Execute(query, new
+                {
+                    StatusID = statusID,
+                    ID = ID
+                });
+            }
+        }
+
     }
 }
