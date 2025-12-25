@@ -123,7 +123,7 @@ namespace TaskManagerProto
             {
                 string query = $"USE {dbName} " +
                     "INSERT INTO Task_Status (Name) " +
-                    "VALUES ('Новая'),('В процессе'),('Готово'); " +
+                    "VALUES ('Новая'),('В процессе'),('Готова'); " +
                     "INSERT INTO Task_Type (Name) " +
                     "VALUES ('Работа'),('Дом'),('Личное'); ";
                 connection.Execute(query);

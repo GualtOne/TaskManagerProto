@@ -94,14 +94,14 @@ namespace TaskManagerProto
             ToolStripButton sortbypriority = new ToolStripButton()
             {
                 Text = "По проритету",
-                ToolTipText = "Сортирует по проритету (High, medium, low)",
+                ToolTipText = "Сортирует по проритету (Высокий, Средний, низкий)",
                 Dock = DockStyle.Fill,
             };
 
             ToolStripButton sortbystatus = new ToolStripButton()
             {
                 Text = "По статусу",
-                ToolTipText = "Сортирует по статусу (Новая, В процессе, Готово)",
+                ToolTipText = "Сортирует по статусу (Новая, В процессе, Готова)",
                 Dock = DockStyle.Fill,
             };
 
