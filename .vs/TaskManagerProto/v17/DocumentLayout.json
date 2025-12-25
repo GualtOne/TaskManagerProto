@@ -3,24 +3,24 @@
   "WorkspaceRootPath": "C:\\Users\\UserM\\TaskManagerProto\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{8F57CCEF-16D7-4338-A496-FAA9E6EBC077}|TaskManagerProto\\TaskManagerProto.csproj|C:\\Users\\UserM\\TaskManagerProto\\taskmanagerproto\\classes\\model.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{8F57CCEF-16D7-4338-A496-FAA9E6EBC077}|TaskManagerProto\\TaskManagerProto.csproj|solutionrelative:taskmanagerproto\\classes\\model.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{8F57CCEF-16D7-4338-A496-FAA9E6EBC077}|TaskManagerProto\\TaskManagerProto.csproj|C:\\Users\\UserM\\TaskManagerProto\\taskmanagerproto\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{8F57CCEF-16D7-4338-A496-FAA9E6EBC077}|TaskManagerProto\\TaskManagerProto.csproj|solutionrelative:taskmanagerproto\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{8F57CCEF-16D7-4338-A496-FAA9E6EBC077}|TaskManagerProto\\TaskManagerProto.csproj|c:\\users\\userm\\taskmanagerproto\\taskmanagerproto\\classes\\taskmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{8F57CCEF-16D7-4338-A496-FAA9E6EBC077}|TaskManagerProto\\TaskManagerProto.csproj|solutionrelative:taskmanagerproto\\classes\\taskmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{8F57CCEF-16D7-4338-A496-FAA9E6EBC077}|TaskManagerProto\\TaskManagerProto.csproj|C:\\Users\\UserM\\TaskManagerProto\\taskmanagerproto\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{8F57CCEF-16D7-4338-A496-FAA9E6EBC077}|TaskManagerProto\\TaskManagerProto.csproj|solutionrelative:taskmanagerproto\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{8F57CCEF-16D7-4338-A496-FAA9E6EBC077}|TaskManagerProto\\TaskManagerProto.csproj|C:\\Users\\UserM\\TaskManagerProto\\taskmanagerproto\\classes\\dbmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{8F57CCEF-16D7-4338-A496-FAA9E6EBC077}|TaskManagerProto\\TaskManagerProto.csproj|solutionrelative:taskmanagerproto\\classes\\dbmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8F57CCEF-16D7-4338-A496-FAA9E6EBC077}|TaskManagerProto\\TaskManagerProto.csproj|C:\\Users\\UserM\\TaskManagerProto\\taskmanagerproto\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8F57CCEF-16D7-4338-A496-FAA9E6EBC077}|TaskManagerProto\\TaskManagerProto.csproj|solutionrelative:taskmanagerproto\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8F57CCEF-16D7-4338-A496-FAA9E6EBC077}|TaskManagerProto\\TaskManagerProto.csproj|C:\\Users\\UserM\\TaskManagerProto\\taskmanagerproto\\classes\\taskmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8F57CCEF-16D7-4338-A496-FAA9E6EBC077}|TaskManagerProto\\TaskManagerProto.csproj|solutionrelative:taskmanagerproto\\classes\\taskmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8F57CCEF-16D7-4338-A496-FAA9E6EBC077}|TaskManagerProto\\TaskManagerProto.csproj|C:\\Users\\UserM\\TaskManagerProto\\taskmanagerproto\\classes\\model.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8F57CCEF-16D7-4338-A496-FAA9E6EBC077}|TaskManagerProto\\TaskManagerProto.csproj|solutionrelative:taskmanagerproto\\classes\\model.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -30,17 +30,17 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 4,
               "Title": "Model.cs",
               "DocumentMoniker": "C:\\Users\\UserM\\TaskManagerProto\\TaskManagerProto\\classes\\Model.cs",
               "RelativeDocumentMoniker": "TaskManagerProto\\classes\\Model.cs",
               "ToolTip": "C:\\Users\\UserM\\TaskManagerProto\\TaskManagerProto\\classes\\Model.cs",
               "RelativeToolTip": "TaskManagerProto\\classes\\Model.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAACgAAAAFAAAAAAAAAA==",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAACgAAAAFAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-12-17T09:54:58.601Z",
               "IsPinned": true,
@@ -48,46 +48,46 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 0,
               "Title": "Form1.cs",
               "DocumentMoniker": "C:\\Users\\UserM\\TaskManagerProto\\TaskManagerProto\\Form1.cs",
               "RelativeDocumentMoniker": "TaskManagerProto\\Form1.cs",
               "ToolTip": "C:\\Users\\UserM\\TaskManagerProto\\TaskManagerProto\\Form1.cs",
               "RelativeToolTip": "TaskManagerProto\\Form1.cs",
-              "ViewState": "AgIAAAYAAAAAAAAAAAAtwLQAAAAJAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAALwAAAAXAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-12-24T21:29:03.5Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 1,
               "Title": "DBmanager.cs",
               "DocumentMoniker": "C:\\Users\\UserM\\TaskManagerProto\\TaskManagerProto\\classes\\DBmanager.cs",
               "RelativeDocumentMoniker": "TaskManagerProto\\classes\\DBmanager.cs",
               "ToolTip": "C:\\Users\\UserM\\TaskManagerProto\\TaskManagerProto\\classes\\DBmanager.cs",
               "RelativeToolTip": "TaskManagerProto\\classes\\DBmanager.cs",
-              "ViewState": "AgIAANAAAAAAAAAAAAD4v98AAAAJAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAN8AAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-12-23T15:04:34.122Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "TaskManager.cs",
               "DocumentMoniker": "C:\\Users\\UserM\\TaskManagerProto\\TaskManagerProto\\classes\\TaskManager.cs",
               "RelativeDocumentMoniker": "TaskManagerProto\\classes\\TaskManager.cs",
               "ToolTip": "C:\\Users\\UserM\\TaskManagerProto\\TaskManagerProto\\classes\\TaskManager.cs",
               "RelativeToolTip": "TaskManagerProto\\classes\\TaskManager.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAPoAAABGAAAAAAAAAA==",
+              "ViewState": "AgIAAEMBAAAAAAAAAAAqwPoAAABGAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-12-18T08:20:33.094Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\Users\\UserM\\TaskManagerProto\\TaskManagerProto\\Program.cs",
               "RelativeDocumentMoniker": "TaskManagerProto\\Program.cs",

@@ -192,3 +192,7 @@ C:\Users\UserM\TaskManagerProto\TaskManagerProto\obj\Debug\TaskManagerProto.cspr
 C:\Users\UserM\TaskManagerProto\TaskManagerProto\obj\Debug\TaskMana.C0C5AFC8.Up2Date
 C:\Users\UserM\TaskManagerProto\TaskManagerProto\obj\Debug\TaskManagerProto.exe
 C:\Users\UserM\TaskManagerProto\TaskManagerProto\obj\Debug\TaskManagerProto.pdb
+C:\Users\UserM\TaskManagerProto\TaskManagerProto\bin\Debug\TaskManagerProto.exe.manifest
+C:\Users\UserM\TaskManagerProto\TaskManagerProto\bin\Debug\TaskManagerProto.application
+C:\Users\UserM\TaskManagerProto\TaskManagerProto\obj\Debug\TaskManagerProto.exe.manifest
+C:\Users\UserM\TaskManagerProto\TaskManagerProto\obj\Debug\TaskManagerProto.application
