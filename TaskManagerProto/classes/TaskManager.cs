@@ -232,7 +232,7 @@ namespace TaskManagerProto
                 descriptionBox.Text = task.TaskDescription;
                 dateTimePicker.Value = task.DeadLine ?? DateTime.Now.AddDays(7);
 
-                var currentStatusName = DBmanager.GetTaskStatusName(task.StatusID);
+                var currentStatusName = DBmanager.GetTaskStatusName(Convert.ToInt32(task.StatusID));
                 if (!string.IsNullOrEmpty(currentStatusName))
                 {
                     for (int i = 0; i < statusComboBox.Items.Count; i++)
@@ -245,7 +245,7 @@ namespace TaskManagerProto
                     }
                 }
 
-                var currentTypeName = DBmanager.GetTaskTypeName(task.TypeID);
+                var currentTypeName = DBmanager.GetTaskTypeName(Convert.ToInt32(task.StatusID));
                 if (!string.IsNullOrEmpty(currentTypeName))
                 {
                     for (int i = 0; i < typeComboBox.Items.Count; i++)
@@ -347,7 +347,7 @@ namespace TaskManagerProto
             {
                 return priority;
             }
-            return Priority.Low;
+            return Priority.Низкий;
         }
     }
 }

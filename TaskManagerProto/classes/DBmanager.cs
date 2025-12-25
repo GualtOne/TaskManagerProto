@@ -103,11 +103,11 @@ namespace TaskManagerProto
                         "ALTER TABLE Task " +
                         "ADD FOREIGN KEY (StatusID) REFERENCES Task_Status(ID) " +
                         "ON DELETE CASCADE " +
-                        "ON UPDATE SET NULL; " +
+                        "   ON UPDATE SET NULL; " +
                         "ALTER TABLE Task " +
                         "ADD FOREIGN KEY (TypeID) REFERENCES Task_Type(ID) " +
-                        "ON DELETE CASCADE" +
-                        "ON UPDATE SET NULL;";
+                        "ON DELETE CASCADE " +
+                        "   ON UPDATE SET NULL";
                     connection.Execute(query);
                 }
             }
@@ -175,7 +175,7 @@ namespace TaskManagerProto
             }
         }
 
-        public static void AddTask(string taskName, string taskDescription, int statusID, int typeID, DateTime startDate, DateTime? deadLine, Priority priority)
+        public static void AddTask(string taskName, string taskDescription, int? statusID, int? typeID, DateTime startDate, DateTime? deadLine, Priority priority)
         {
             using (var connection = new SqlConnection(connectionString))
             {
@@ -193,7 +193,7 @@ namespace TaskManagerProto
             }
         }
 
-        public static void UpdateTask(int ID, string taskName, string taskDescription, int statusID, int typeID, DateTime? deadLine, Priority priority)
+        public static void UpdateTask(int ID, string taskName, string taskDescription, int? statusID, int? typeID, DateTime? deadLine, Priority priority)
         {
             using (var connection = new SqlConnection(connectionString))
             {
@@ -222,6 +222,7 @@ namespace TaskManagerProto
                 return connection.QueryFirstOrDefault<string>(query, new { ID = ID });
             }
         }
+
 
         public static string GetTaskTypeName(int ID)
         {
@@ -291,7 +292,7 @@ namespace TaskManagerProto
         }
 
 
-        public static void UpdateStatus(int ID, int statusID)
+        public static void UpdateStatus(int ID, int? statusID)
         {
             using (var connection = new SqlConnection(connectionString))
             {

@@ -21,9 +21,23 @@ namespace TaskManagerProto
         private ToolStrip toolStrip;
         private ListViewItem item;
 
+        public enum SortKind
+        {
+            ByID,
+            ByName,
+            ByDate,
+            ByDeadline,
+            ByType,
+            ByStatus,
+            ByPriority,
+        }
+
+        bool deadlinetodaybuttonpressed = false;
+        bool deadlinexpiredbuttonpressed = false;
+        bool deadlinetomorowdbuttonpressed = false;
+
         public Form1()
         {
-            DBmanager.Connection();
             InitializeComponent();
             InitializeTaskListView();
             this.Text = "Менеджер задач";
@@ -40,7 +54,7 @@ namespace TaskManagerProto
             this.Controls.Add(panel);
             panel.Controls.Add(taskListView);
             InitializeToolstrip();
-            RefreshTaskList();
+            RefreshTaskList(SortKind.ByID);
             CheckDeadlineToday();
         }
 
@@ -55,7 +69,7 @@ namespace TaskManagerProto
             ToolStripDropDown dropDownfilter = new ToolStripDropDown();
             ToolStripDropDownButton filterbtn = new ToolStripDropDownButton()
             {
-                Text = "Фильтр",
+                Text = "Сортировка",
                 ToolTipText = "Выбор способа сортировки",
                 DropDown = dropDownfilter,
                 DropDownDirection = ToolStripDropDownDirection.Default,
@@ -66,19 +80,53 @@ namespace TaskManagerProto
             ToolStripButton sortbyid = new ToolStripButton()
             {
                 Text = "По ID",
-                ToolTipText = "Сортирует по ID",
+                ToolTipText = "Сортирует по ID (0-9)",
+                Dock = DockStyle.Fill,
+            };
+
+            ToolStripButton sortbyname = new ToolStripButton()
+            {
+                Text = "По имени",
+                ToolTipText = "Сортирует по Имени (0-9 ,A-Z, А-Я)",
+                Dock = DockStyle.Fill,
+            };
+
+            ToolStripButton sortbypriority = new ToolStripButton()
+            {
+                Text = "По проритету",
+                ToolTipText = "Сортирует по проритету (High, medium, low)",
                 Dock = DockStyle.Fill,
             };
 
             ToolStripButton sortbystatus = new ToolStripButton()
             {
-                Text = "По проритету",
-                ToolTipText = "Сортирует по проритету",
+                Text = "По статусу",
+                ToolTipText = "Сортирует по статусу (Новая, В процессе, Готово)",
                 Dock = DockStyle.Fill,
             };
 
-            filterbtn.DropDown.Items.Add(sortbystatus);
-            filterbtn.DropDown.Items.Add(sortbyid);
+            ToolStripButton sortbytype = new ToolStripButton()
+            {
+                Text = "По типу",
+                ToolTipText = "Сортирует по типу (Работа, Дом, Личное)",
+                Dock = DockStyle.Fill,
+            };
+
+            ToolStripButton sortbydeadline = new ToolStripButton()
+            {
+                Text = "По дедлайну",
+                ToolTipText = "Сортирует по дедлайну (сначала близкие)",
+                Dock = DockStyle.Fill,
+            };
+
+            ToolStripButton sortbydate = new ToolStripButton()
+            {
+                Text = "По дате создания",
+                ToolTipText = "Сортирует по дате создания (более недавние)",
+                Dock = DockStyle.Fill,
+            };
+
+            filterbtn.DropDown.Items.AddRange(new ToolStripItem[] { sortbyid, sortbyname, sortbystatus, sortbytype, sortbypriority, sortbydeadline, sortbydate });
 
             ToolStripButton addbtn = new ToolStripButton()
             {
@@ -116,37 +164,21 @@ namespace TaskManagerProto
             chckdl.DropDown.Items.Add(chckdltoday);
             chckdl.DropDown.Items.Add(chckdlexpired);
 
-            //удали это если не надо
-            ToolStripButton testd = new ToolStripButton()
-           {
-               Text = "DEADLINE",
-               ToolTipText = ""
-           };
+            sortbypriority.Click += (s, e) => RefreshTaskList(SortKind.ByPriority);
+            sortbyid.Click += (s, e) => RefreshTaskList(SortKind.ByID);
+            sortbyname.Click += (s, e) => RefreshTaskList(SortKind.ByName);
+            sortbystatus.Click += (s, e) => RefreshTaskList(SortKind.ByStatus);
+            sortbytype.Click += (s, e) => RefreshTaskList(SortKind.ByType);
+            sortbydeadline.Click += (s, e) => RefreshTaskList(SortKind.ByDeadline);
+            sortbydate.Click += (s, e) => RefreshTaskList(SortKind.ByDate);
 
-            sortbystatus.Click += (s, e) => SortByPriority();
-            sortbyid.Click += (s, e) => RefreshTaskList();
 
             addbtn.Click += (s, e) => AddTaskWindow();
-            chckdltoday.Click += (s, e) => CheckDeadlineToday();
-            chckdlexpired.Click += (s, e) => CheckDeadlineExpired();
-            testd.Click += (s, e) => DEADLINE();
+            chckdltoday.Click += (s, e) => { deadlinetodaybuttonpressed = true; CheckDeadlineToday(); };
+            chckdlexpired.Click += (s, e) => { deadlinexpiredbuttonpressed = true; CheckDeadlineExpired(); };;
             panel.Controls.Add(toolStrip);
-            toolStrip.Items.AddRange(new ToolStripItem[] { addbtn, filterbtn, chckdl, testd });
+            toolStrip.Items.AddRange(new ToolStripItem[] { addbtn, filterbtn, chckdl});
         }
-
-        private void DEADLINE()
-        {
-            Task selectedTask = GetSelectedTask();
-            if (selectedTask != null)
-            {
-                MessageBox.Show((selectedTask.StatusID + 1).ToString());
-            }
-            else 
-            {
-                MessageBox.Show("bruh");
-            }
-        }
-
 
         private void AddTaskWindow()
         {
@@ -172,7 +204,7 @@ namespace TaskManagerProto
 
                         MessageBox.Show("Задача успешно добавлена", "Успех",
                             MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        RefreshTaskList();
+                        RefreshTaskList(SortKind.ByID);
                     }
                     catch (Exception ex)
                     {
@@ -206,7 +238,7 @@ namespace TaskManagerProto
 
                         MessageBox.Show("Задача успешно обновлена", "Успех",
                             MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        RefreshTaskList();
+                        RefreshTaskList(SortKind.ByID);
                     }
                     catch (Exception ex)
                     {
@@ -261,23 +293,46 @@ namespace TaskManagerProto
             return contextMenu;
         }
 
-        private void RefreshTaskList()
+        private void RefreshTaskList(SortKind sort)
         {
             try
             {
                 taskListView.BeginUpdate();
                 taskListView.Items.Clear();
 
-                var tasks = DBmanager.GetTasks().ToList();
-
+                var tasks = DBmanager.GetTasks();
+                switch (sort)
+                {
+                    case SortKind.ByID:
+                        tasks = DBmanager.GetTasks().ToList().OrderBy(p => p.ID);
+                        break;
+                    case SortKind.ByName:
+                        tasks = DBmanager.GetTasks().ToList().OrderBy(p => p.TaskName);
+                        break;
+                    case SortKind.ByDeadline:
+                        tasks = DBmanager.GetTasks().ToList().OrderBy(p => p.DeadLine);
+                        break;
+                    case SortKind.ByDate:
+                        tasks = DBmanager.GetTasks().ToList().OrderBy(p => p.StartDate);
+                        break;
+                    case SortKind.ByPriority:
+                        tasks = DBmanager.GetTasks().ToList().OrderByDescending(p => p.Priority);
+                        break;
+                    case SortKind.ByStatus:
+                        tasks = DBmanager.GetTasks().ToList().OrderBy(p => p.StatusID);
+                        break;
+                    case SortKind.ByType:
+                        tasks = DBmanager.GetTasks().ToList().OrderBy(p => p.TypeID);
+                        break;
+                }
                 foreach (var task in tasks)
                 {
                     try
                     {
                         item = new ListViewItem(task.ID.ToString());
                         item.SubItems.Add(task.TaskName);
-                        string statusName = DBmanager.GetTaskStatusName(task.StatusID);
-                        string typeName = DBmanager.GetTaskTypeName(task.TypeID);
+                        string statusName = DBmanager.GetTaskStatusName(Convert.ToInt32(task.StatusID));
+                        string typeName = DBmanager.GetTaskTypeName(Convert.ToInt32(task.TypeID));
 
                         item.SubItems.Add(string.IsNullOrEmpty(statusName) ? "Не указан" : statusName);
                         item.SubItems.Add(string.IsNullOrEmpty(typeName) ? "Не указан" : typeName);
@@ -293,7 +348,7 @@ namespace TaskManagerProto
                     }
                 }
 
-                statusLabel.Text = $"Всего задач: {tasks.Count} | Последнее обновление: {DateTime.Now:HH:mm:ss}";
+                statusLabel.Text = $"Всего задач: {tasks.Count()} | Последнее обновление: {DateTime.Now:HH:mm:ss}";
                 CheckDeadlineExpired();
             }
             catch (Exception ex)
@@ -346,7 +401,7 @@ namespace TaskManagerProto
                     if (result == DialogResult.Yes)
                     {
                         DBmanager.DeleteTask(selectedTask.ID);
-                        RefreshTaskList();
+                        RefreshTaskList(SortKind.ByID);
                         MessageBox.Show($"Задача '{taskName}' успешно удалена.", "Информация",
                             MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
@@ -371,8 +426,8 @@ namespace TaskManagerProto
             {
                 try
                 {
-                    string statusName = DBmanager.GetTaskStatusName(selectedTask.StatusID);
-                    string typeName = DBmanager.GetTaskTypeName(selectedTask.TypeID);
+                    string statusName = DBmanager.GetTaskStatusName(Convert.ToInt32(selectedTask.StatusID));
+                    string typeName = DBmanager.GetTaskTypeName(Convert.ToInt32(selectedTask.TypeID));
 
                     string info = $"ID: {selectedTask.ID}\n" +
                                   $"Название: {selectedTask.TaskName}\n" +
@@ -392,6 +447,11 @@ namespace TaskManagerProto
                         MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
+            else
+            {
+                MessageBox.Show("Выберите задачу.", "Информация",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
         }
 
         private Task GetSelectedTask()
@@ -403,76 +463,26 @@ namespace TaskManagerProto
             return null;
         }
 
-        private void SortByPriority()
-        {
-            int listcountview = taskListView.Items.Count;
-            if (listcountview > 0) 
-            {
-                for (int i = 0; i < listcountview; i++) 
-                {
-                    try
-                    {
-                        taskListView.BeginUpdate();
-                        taskListView.Items.Clear();
-
-                        var tasks = DBmanager.GetTasks().ToList().OrderByDescending(p => p.Priority);
-
-                        foreach (var task in tasks)
-                        {
-                            try
-                            {
-                                item = new ListViewItem(task.ID.ToString());
-                                item.SubItems.Add(task.TaskName);
-                                string statusName = DBmanager.GetTaskStatusName(task.StatusID);
-                                string typeName = DBmanager.GetTaskTypeName(task.TypeID);
-
-                                item.SubItems.Add(string.IsNullOrEmpty(statusName) ? "Не указан" : statusName);
-                                item.SubItems.Add(string.IsNullOrEmpty(typeName) ? "Не указан" : typeName);
-                                item.SubItems.Add(task.Priority.ToString());
-                                item.SubItems.Add(task.StartDate.ToString("dd.MM.yyyy HH:mm"));
-                                item.SubItems.Add(task.DeadLine?.ToString("dd.MM.yyyy HH:mm") ?? "Нет");
-                                item.Tag = task;
-                                taskListView.Items.Add(item);
-                            }
-                            catch (Exception ex)
-                            {
-                                Debug.WriteLine($"Ошибка при добавлении задачи в список: {ex.Message}");
-                            }
-                        }
-                        CheckDeadlineExpired();
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show($"Ошибка при обновлении списка задач: {ex.Message}", "Ошибка",
-                            MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                    finally
-                    {
-                        taskListView.EndUpdate();
-                    }
-                }
-            }
-        }
-
         private void NextStatus()
         {
             Task selectedTask = GetSelectedTask();
+            int statuscount = DBmanager.GetAllStatuses().Count();
             if (selectedTask != null)
             {
-                string status = DBmanager.GetTaskStatusName(selectedTask.StatusID);
+                int ID = selectedTask.ID;
+                int statusID = Convert.ToInt32(selectedTask.StatusID);
                 try
                 {
-                    switch (status)
+                    if (statuscount > 0)
                     {
-                        case "Новая":
-                            DBmanager.UpdateStatus(selectedTask.ID, selectedTask.StatusID + 1);
-                            break;
-                        case "В процессе":
-                            DBmanager.UpdateStatus(selectedTask.ID, selectedTask.StatusID + 1);
-                            break;
-                        case "Готово":
-                            DBmanager.UpdateStatus(selectedTask.ID, selectedTask.StatusID - 2);
-                            break;
+                        if (statusID < statuscount)
+                        {
+                            DBmanager.UpdateStatus(ID, statusID + 1);
+                        }
+                        else if (statusID >= statuscount)
+                        {
+                            DBmanager.UpdateStatus(ID, statusID - (statuscount - 1));
+                        }
                     }
                 }
                 catch (Exception e)
@@ -485,7 +495,7 @@ namespace TaskManagerProto
                 MessageBox.Show("Выберите задачу для изменения.", "Информация",
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-            RefreshTaskList();
+            RefreshTaskList(SortKind.ByID);
         }
         
         private void NextPriority()
@@ -498,14 +508,14 @@ namespace TaskManagerProto
                 {
                     switch (priority)
                     {
-                        case Priority.Low:
-                            DBmanager.UpdatePriority(selectedTask.ID, Priority.Medium);
+                        case Priority.Низкий:
+                            DBmanager.UpdatePriority(selectedTask.ID, Priority.Средний);
                             break;
-                        case Priority.Medium:
-                            DBmanager.UpdatePriority(selectedTask.ID, Priority.High);
+                        case Priority.Средний:
+                            DBmanager.UpdatePriority(selectedTask.ID, Priority.Высокий);
                             break;
-                        case Priority.High:
-                            DBmanager.UpdatePriority(selectedTask.ID, Priority.Low);
+                        case Priority.Высокий:
+                            DBmanager.UpdatePriority(selectedTask.ID, Priority.Низкий);
                             break;
                     }
                 }
@@ -519,7 +529,7 @@ namespace TaskManagerProto
                 MessageBox.Show("Выберите задачу для изменения.", "Информация",
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-            RefreshTaskList();
+            RefreshTaskList(SortKind.ByID);
         }
 
 
@@ -537,9 +547,14 @@ namespace TaskManagerProto
                     }
                 }
                 if (dla.Count > 0)
-                {    
+                {
                     string resualt = $"Сегодня дедланй у задачи/задач {string.Join("; ", dla)}.";
                     MessageBox.Show(resualt, "Дедлайны");
+                }
+                else if (dla.Count <= 0 && deadlinetodaybuttonpressed)
+                {
+                    MessageBox.Show("Сегодня нет дедлайнов", "Дедлайны");
+                    deadlinetodaybuttonpressed = false;
                 }
             }
             catch (Exception e)
@@ -561,12 +576,26 @@ namespace TaskManagerProto
                         dla.Add(i);
                     }
                 }
-                if (dla.Count > 0)
+                if (dla.Count > 0 && !deadlinexpiredbuttonpressed)
                 {
                     foreach (int item in dla)
                     {
                         taskListView.Items[item].BackColor = Color.Red;
                     }
+                }
+                else if (dla.Count > 0 && deadlinexpiredbuttonpressed)
+                {
+                    foreach (int item in dla)
+                    {
+                        taskListView.Items[item].BackColor = Color.Red;
+                    }
+                    MessageBox.Show("Задачи с просроченным дедлайном помечены", "Дедлайны");
+                    deadlinexpiredbuttonpressed = false;
+                }
+                else if (dla.Count <= 0 && deadlinexpiredbuttonpressed)
+                {
+                    MessageBox.Show("Нету задач с просроченным дедлайном", "Дедлайны");
+                    deadlinexpiredbuttonpressed = false;
                 }
             }
             catch (Exception e)

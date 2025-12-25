@@ -16,6 +16,7 @@ namespace TaskManagerProto
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+            DBmanager.Connection();
             Application.Run(new Form1());
         }
     }
