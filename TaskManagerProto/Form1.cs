@@ -56,6 +56,7 @@ namespace TaskManagerProto
             InitializeToolstrip();
             RefreshTaskList(SortKind.ByID);
             CheckDeadlineToday();
+            CheckDeadlineTomorow();
         }
 
         private void InitializeToolstrip()
@@ -63,7 +64,6 @@ namespace TaskManagerProto
             toolStrip = new ToolStrip
             {
                 Dock = DockStyle.Top
-
             };
 
             ToolStripDropDown dropDownfilter = new ToolStripDropDown();
@@ -161,8 +161,14 @@ namespace TaskManagerProto
                 Dock = DockStyle.Fill,
             };
 
-            chckdl.DropDown.Items.Add(chckdltoday);
-            chckdl.DropDown.Items.Add(chckdlexpired);
+            ToolStripButton chckdltomorow = new ToolStripButton()
+            {
+                Text = "Завтра",
+                ToolTipText = "Проверяет наличие задач с дедлайном завтра",
+                Dock = DockStyle.Fill,
+            };
+
+            chckdl.DropDown.Items.AddRange(new ToolStripItem[] { chckdltoday, chckdlexpired, chckdltomorow });
 
             sortbypriority.Click += (s, e) => RefreshTaskList(SortKind.ByPriority);
             sortbyid.Click += (s, e) => RefreshTaskList(SortKind.ByID);
@@ -175,11 +181,11 @@ namespace TaskManagerProto
 
             addbtn.Click += (s, e) => AddTaskWindow();
             chckdltoday.Click += (s, e) => { deadlinetodaybuttonpressed = true; CheckDeadlineToday(); };
-            chckdlexpired.Click += (s, e) => { deadlinexpiredbuttonpressed = true; CheckDeadlineExpired(); };;
+            chckdlexpired.Click += (s, e) => { deadlinexpiredbuttonpressed = true; CheckDeadlineExpired(); };
+            chckdltomorow.Click += (s, e) => { deadlinetomorowdbuttonpressed = true; CheckDeadlineTomorow(); };
             panel.Controls.Add(toolStrip);
             toolStrip.Items.AddRange(new ToolStripItem[] { addbtn, filterbtn, chckdl});
         }
-
         private void AddTaskWindow()
         {
             using (var addForm = new TaskManager())
@@ -532,6 +538,45 @@ namespace TaskManagerProto
             RefreshTaskList(SortKind.ByID);
         }
 
+        private void CheckDeadlineTomorow()
+        {
+            try
+            {
+                List<string> dla = new List<string>();
+                for (int i = 0; i < taskListView.Items.Count; i++)
+                {
+                    DateTime deadline = Convert.ToDateTime(taskListView.Items[i].SubItems[6].Text);
+                    if (deadline.Day == DateTime.Now.Day + 1)
+                    {
+                        dla.Add(taskListView.Items[i].SubItems[1].Text);
+                    }
+                }
+                if (dla.Count > 0)
+                {
+                    string c = "";
+                    if (dla.Count > 1)
+                    {
+                        c = "задач";
+                    }
+                    else if (dla.Count == 1)
+                    {
+                        c = "задачи";
+                    }
+                    string resualt = $"Завтра дедланй у {c} {string.Join("; ", dla)}.";
+                    MessageBox.Show(resualt, "Дедлайны");
+                }
+                else if (dla.Count <= 0 && deadlinetomorowdbuttonpressed)
+                {
+                    MessageBox.Show("Дедлайнов завтра нет", "Дедлайны");
+                    deadlinetomorowdbuttonpressed = false;
+                }
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message);
+            }
+        }
+
 
         private void CheckDeadlineToday()
         {
@@ -548,7 +593,16 @@ namespace TaskManagerProto
                 }
                 if (dla.Count > 0)
                 {
-                    string resualt = $"Сегодня дедланй у задачи/задач {string.Join("; ", dla)}.";
+                    string c = "";
+                    if (dla.Count > 1)
+                    {
+                        c = "задач";
+                    }
+                    else if(dla.Count == 1)
+                    {
+                        c = "задачи";
+                    }
+                    string resualt = $"Сегодня дедланй у {c} {string.Join("; ", dla)}.";
                     MessageBox.Show(resualt, "Дедлайны");
                 }
                 else if (dla.Count <= 0 && deadlinetodaybuttonpressed)
