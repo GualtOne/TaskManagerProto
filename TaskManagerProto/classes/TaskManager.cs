@@ -19,6 +19,7 @@ namespace TaskManagerProto
         private Label typeLabel;
         private Label priorityLabel;
         private Label deadlineLabel;
+        private Label TipLabel;
         private Button saveButton;
         private Button cancelButton;
         private Panel mainPanel;
@@ -77,7 +78,8 @@ namespace TaskManagerProto
             {
                 Dock = DockStyle.Top,
                 Height = 30,
-                Margin = new Padding(5, 0, 5, 5)
+                Margin = new Padding(5, 0, 5, 5),
+                MaxLength = 100,
             };
 
             descriptionLabel = new Label()
@@ -85,7 +87,7 @@ namespace TaskManagerProto
                 Text = "Описание задачи:",
                 Dock = DockStyle.Top,
                 Height = 25,
-                Padding = new Padding(5, 5, 0, 0)
+                Padding = new Padding(5, 5, 0, 0),
             };
 
             descriptionBox = new TextBox()
@@ -94,7 +96,8 @@ namespace TaskManagerProto
                 Height = 80,
                 Multiline = true,
                 ScrollBars = ScrollBars.Vertical,
-                Margin = new Padding(5, 0, 5, 5)
+                Margin = new Padding(5, 0, 5, 5),
+                MaxLength = 500,
             };
 
             statusLabel = new Label()
@@ -161,6 +164,14 @@ namespace TaskManagerProto
                 Margin = new Padding(5, 0, 5, 5)
             };
 
+            TipLabel = new Label()
+            {
+                Text = "Подсказка: Имя не может быть пустым или длинее 100 и описание не может быть длинее 500",
+                Dock = DockStyle.Top,
+                Height = 50,
+                Padding = new Padding(5, 5, 0, 0)
+            };
+
             saveButton = new Button()
             {
                 Height = 40,
@@ -187,6 +198,7 @@ namespace TaskManagerProto
             mainPanel.Controls.AddRange(new Control[] {
                 saveButton,
                 cancelButton,
+                TipLabel,
                 dateTimePicker, deadlineLabel,
                 priorityComboBox, priorityLabel,
                 typeComboBox, typeLabel,

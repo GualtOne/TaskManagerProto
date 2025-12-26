@@ -35,6 +35,7 @@ namespace TaskManagerProto
         bool deadlinetodaybuttonpressed = false;
         bool deadlinexpiredbuttonpressed = false;
         bool deadlinetomorowdbuttonpressed = false;
+        bool formloaded = false;
 
         public Form1()
         {
@@ -55,8 +56,7 @@ namespace TaskManagerProto
             panel.Controls.Add(taskListView);
             InitializeToolstrip();
             RefreshTaskList(SortKind.ByID);
-            CheckDeadlineToday();
-            CheckDeadlineTomorow();
+            formloaded = true;
         }
 
         private void InitializeToolstrip()
@@ -356,6 +356,8 @@ namespace TaskManagerProto
 
                 statusLabel.Text = $"Всего задач: {tasks.Count()} | Последнее обновление: {DateTime.Now:HH:mm:ss}";
                 CheckDeadlineExpired();
+                CheckDeadlineToday();
+                CheckDeadlineTomorow();
             }
             catch (Exception ex)
             {
@@ -543,15 +545,17 @@ namespace TaskManagerProto
             try
             {
                 List<string> dla = new List<string>();
+                List<int> dlaa = new List<int>();
                 for (int i = 0; i < taskListView.Items.Count; i++)
                 {
                     DateTime deadline = Convert.ToDateTime(taskListView.Items[i].SubItems[6].Text);
                     if (deadline.Day == DateTime.Now.Day + 1)
                     {
                         dla.Add(taskListView.Items[i].SubItems[1].Text);
+                        dlaa.Add(i);
                     }
                 }
-                if (dla.Count > 0)
+                if (dla.Count > 0 && !formloaded)
                 {
                     string c = "";
                     if (dla.Count > 1)
@@ -564,6 +568,33 @@ namespace TaskManagerProto
                     }
                     string resualt = $"Завтра дедланй у {c} {string.Join("; ", dla)}.";
                     MessageBox.Show(resualt, "Дедлайны");
+                }
+                if (dla.Count > 0 && !deadlinetomorowdbuttonpressed)
+                {
+                    foreach (int item in dlaa)
+                    {
+                        taskListView.Items[item].BackColor = Color.Yellow;
+                    }
+                }
+                else if (dla.Count > 0 && deadlinetomorowdbuttonpressed)
+                {
+                    string c = "";
+                    if (dla.Count > 1)
+                    {
+                        c = "задач";
+                    }
+                    else if (dla.Count == 1)
+                    {
+                        c = "задачи";
+                    }
+                    string resualt = $"Завтра дедланй у {c} {string.Join("; ", dla)}.";
+                    MessageBox.Show(resualt, "Дедлайны");
+                    foreach (int item in dlaa)
+                    {
+                        taskListView.Items[item].BackColor = Color.Yellow;
+                    }
+                    MessageBox.Show("Задачи с дедлайном завтра, помечены", "Дедлайны");
+                    deadlinetomorowdbuttonpressed = false;
                 }
                 else if (dla.Count <= 0 && deadlinetomorowdbuttonpressed)
                 {
@@ -583,15 +614,17 @@ namespace TaskManagerProto
             try
             {
                 List<string> dla = new List<string>();
+                List<int> dlaa = new List<int>();
                 for (int i = 0; i < taskListView.Items.Count; i++)
                 {
                     DateTime deadline = Convert.ToDateTime(taskListView.Items[i].SubItems[6].Text);
                     if (deadline.Day == DateTime.Now.Day)
                     {
                         dla.Add(taskListView.Items[i].SubItems[1].Text);
+                        dlaa.Add(i);
                     }
                 }
-                if (dla.Count > 0)
+                if (dla.Count > 0 && !formloaded)
                 {
                     string c = "";
                     if (dla.Count > 1)
@@ -604,6 +637,33 @@ namespace TaskManagerProto
                     }
                     string resualt = $"Сегодня дедланй у {c} {string.Join("; ", dla)}.";
                     MessageBox.Show(resualt, "Дедлайны");
+                }
+                if (dla.Count > 0 && !deadlinetodaybuttonpressed)
+                {
+                    foreach (int item in dlaa)
+                    {
+                        taskListView.Items[item].BackColor = Color.Orange;
+                    }
+                }
+                else if (dla.Count > 0 && deadlinetodaybuttonpressed)
+                {
+                    string c = "";
+                    if (dla.Count > 1)
+                    {
+                        c = "задач";
+                    }
+                    else if (dla.Count == 1)
+                    {
+                        c = "задачи";
+                    }
+                    string resualt = $"Сегодня дедланй у {c} {string.Join("; ", dla)}.";
+                    MessageBox.Show(resualt, "Дедлайны");
+                    foreach (int item in dlaa)
+                    {
+                        taskListView.Items[item].BackColor = Color.Orange;
+                    }
+                    MessageBox.Show("Задачи с дедлайном сегодня, помечены", "Дедлайны");
+                    deadlinetodaybuttonpressed = false;
                 }
                 else if (dla.Count <= 0 && deadlinetodaybuttonpressed)
                 {
