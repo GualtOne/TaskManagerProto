@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrackBar;
 
 namespace TaskManagerProto
 {
@@ -30,6 +31,13 @@ namespace TaskManagerProto
             ByType,
             ByStatus,
             ByPriority,
+        }
+
+        public enum DLKind
+        {
+            Today,
+            Tomorow,
+            Expired
         }
 
         bool deadlinetodaybuttonpressed = false;
@@ -154,10 +162,24 @@ namespace TaskManagerProto
                 Dock = DockStyle.Fill,
             };
 
+            ToolStripButton chckdltodayonly = new ToolStripButton()
+            {
+                Text = "Только Сегодня",
+                ToolTipText = "Выводит только задачи с дедлайном сегодня",
+                Dock = DockStyle.Fill,
+            };
+
             ToolStripButton chckdlexpired = new ToolStripButton()
             {
                 Text = "Просроченные",
                 ToolTipText = "Проверяет наличие задач с просроченым дедлайном",
+                Dock = DockStyle.Fill,
+            };
+
+            ToolStripButton chckdlexpronly = new ToolStripButton()
+            {
+                Text = "Только просроченные",
+                ToolTipText = "Выводит только задачи с просроченным дедлайном ",
                 Dock = DockStyle.Fill,
             };
 
@@ -168,7 +190,26 @@ namespace TaskManagerProto
                 Dock = DockStyle.Fill,
             };
 
-            chckdl.DropDown.Items.AddRange(new ToolStripItem[] { chckdltoday, chckdlexpired, chckdltomorow });
+            ToolStripButton chckdltomorowonly = new ToolStripButton()
+            {
+                Text = "Только завтра",
+                ToolTipText = "Выводит только задачи с дедлайном завтра",
+                Dock = DockStyle.Fill,
+            };
+
+            ToolStripButton refreshlist = new ToolStripButton()
+            {
+                Text = "Обновить лист",
+                ToolTipText = "Покажет лист как при включение программы"
+            };
+
+            ToolStripButton tip = new ToolStripButton()
+            {
+                Text = "Подсказка",
+                ToolTipText = "Подсказака на счёт интрефейса"
+            };
+
+            chckdl.DropDown.Items.AddRange(new ToolStripItem[] { chckdltoday, chckdltodayonly ,chckdlexpired, chckdlexpronly, chckdltomorow, chckdltomorowonly });
 
             sortbypriority.Click += (s, e) => RefreshTaskList(SortKind.ByPriority);
             sortbyid.Click += (s, e) => RefreshTaskList(SortKind.ByID);
@@ -180,12 +221,25 @@ namespace TaskManagerProto
 
 
             addbtn.Click += (s, e) => AddTaskWindow();
+            refreshlist.Click += (s, e) => RefreshTaskList(SortKind.ByID);
+            tip.Click += (s, e) => ShowTip();
             chckdltoday.Click += (s, e) => { deadlinetodaybuttonpressed = true; CheckDeadlineToday(); };
             chckdlexpired.Click += (s, e) => { deadlinexpiredbuttonpressed = true; CheckDeadlineExpired(); };
             chckdltomorow.Click += (s, e) => { deadlinetomorowdbuttonpressed = true; CheckDeadlineTomorow(); };
+            chckdltodayonly.Click += (s, e) => ShowDeadlineToday();
+            chckdlexpronly.Click += (s, e) => ShowDeadlineExpired();
+            chckdltomorowonly.Click += (s, e) => ShowDeadlineTomorod();
             panel.Controls.Add(toolStrip);
-            toolStrip.Items.AddRange(new ToolStripItem[] { addbtn, filterbtn, chckdl});
+            toolStrip.Items.AddRange(new ToolStripItem[] { addbtn, filterbtn, chckdl, refreshlist, tip});
         }
+
+        private void ShowTip() 
+        {
+            MessageBox.Show($"Дедлайны:\n Красный - просроченная, " +
+                "Оранжевая - сегодня, " +
+                "Желтый - завтра", "Подсказка");
+        }
+
         private void AddTaskWindow()
         {
             using (var addForm = new TaskManager())
@@ -297,6 +351,184 @@ namespace TaskManagerProto
 
             contextMenu.Items.AddRange(new ToolStripItem[] { QuickItem, Edititem, DeleteItem, ShowDesc });
             return contextMenu;
+        }
+
+        private void ShowDeadlineExpired()
+        {
+            try
+            {
+                int count = 0;
+                taskListView.BeginUpdate();
+                taskListView.Items.Clear();
+
+                var tasks = DBmanager.GetTasks();
+                foreach (var task in tasks)
+                {
+                    DateTime? deadline = task.DeadLine;
+                    if (deadline.HasValue && deadline.Value.Date < DateTime.Now.Date && deadline.Value.Date != DateTime.Now.Date)
+                    {
+                        try
+                        {
+                            ListViewItem item = new ListViewItem(task.ID.ToString());
+
+                            item.SubItems.Add(task.TaskName);
+
+                            string statusName = DBmanager.GetTaskStatusName(Convert.ToInt32(task.StatusID));
+                            string typeName = DBmanager.GetTaskTypeName(Convert.ToInt32(task.TypeID));
+
+                            item.SubItems.Add(string.IsNullOrEmpty(statusName) ? "Не указан" : statusName);
+                            item.SubItems.Add(string.IsNullOrEmpty(typeName) ? "Не указан" : typeName);
+                            item.SubItems.Add(task.Priority.ToString());
+
+                            string deadlineStr = deadline.HasValue
+                                ? deadline.Value.ToString("dd.MM.yyyy HH:mm")
+                                : "Нет";
+
+                            item.SubItems.Add(task.StartDate.ToString("dd.MM.yyyy HH:mm"));
+                            item.SubItems.Add(deadlineStr);
+
+                            item.Tag = task;
+                            taskListView.Items.Add(item);
+                            count++;
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine($"Ошибка при добавлении задачи в список: {ex.Message}");
+                        }
+                    }
+                }
+
+                statusLabel.Text = $"Всего задач: {count} | Последнее обновление: {DateTime.Now:HH:mm:ss}";
+                CheckDeadlineExpired();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при обновлении списка задач: {ex.Message}", "Ошибка",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                taskListView.EndUpdate();
+            }
+        }
+
+        private void ShowDeadlineTomorod()
+        {
+            try
+            {
+                int count = 0;
+                taskListView.BeginUpdate();
+                taskListView.Items.Clear();
+
+                var tasks = DBmanager.GetTasks();
+                foreach (var task in tasks)
+                {
+                    DateTime? deadline = task.DeadLine as DateTime?;
+                    if (deadline.Value.Day == DateTime.Now.Day + 1)
+                    {
+                        try
+                        {
+                            ListViewItem item = new ListViewItem(task.ID.ToString());
+
+                            item.SubItems.Add(task.TaskName);
+
+                            string statusName = DBmanager.GetTaskStatusName(Convert.ToInt32(task.StatusID));
+                            string typeName = DBmanager.GetTaskTypeName(Convert.ToInt32(task.TypeID));
+
+                            item.SubItems.Add(string.IsNullOrEmpty(statusName) ? "Не указан" : statusName);
+                            item.SubItems.Add(string.IsNullOrEmpty(typeName) ? "Не указан" : typeName);
+                            item.SubItems.Add(task.Priority.ToString());
+
+                            string deadlineStr = deadline.HasValue
+                                ? deadline.Value.ToString("dd.MM.yyyy HH:mm")
+                                : "Нет";
+
+                            item.SubItems.Add(task.StartDate.ToString("dd.MM.yyyy HH:mm"));
+                            item.SubItems.Add(deadlineStr);
+
+                            item.Tag = task;
+                            taskListView.Items.Add(item);
+                            count++;
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine($"Ошибка при добавлении задачи в список: {ex.Message}");
+                        }
+                    }
+                }
+
+                statusLabel.Text = $"Всего задач: {count} | Последнее обновление: {DateTime.Now:HH:mm:ss}";
+                CheckDeadlineTomorow();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при обновлении списка задач: {ex.Message}", "Ошибка",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                taskListView.EndUpdate();
+            }
+        }
+
+
+        private void ShowDeadlineToday()
+        {
+            try
+            {
+                int count = 0;
+                taskListView.BeginUpdate();
+                taskListView.Items.Clear();
+
+                var tasks = DBmanager.GetTasks();
+                foreach (var task in tasks)
+                {
+                    DateTime? deadline = task.DeadLine as DateTime?;
+                    if (deadline.HasValue && deadline.Value.Day == DateTime.Now.Day)
+                    {
+                        try
+                        {
+                            ListViewItem item = new ListViewItem(task.ID.ToString());
+
+                            item.SubItems.Add(task.TaskName);
+
+                            string statusName = DBmanager.GetTaskStatusName(Convert.ToInt32(task.StatusID));
+                            string typeName = DBmanager.GetTaskTypeName(Convert.ToInt32(task.TypeID));
+
+                            item.SubItems.Add(string.IsNullOrEmpty(statusName) ? "Не указан" : statusName);
+                            item.SubItems.Add(string.IsNullOrEmpty(typeName) ? "Не указан" : typeName);
+                            item.SubItems.Add(task.Priority.ToString());
+
+                            string deadlineStr = deadline.HasValue
+                                ? deadline.Value.ToString("dd.MM.yyyy HH:mm")
+                                : "Нет";
+
+                            item.SubItems.Add(task.StartDate.ToString("dd.MM.yyyy HH:mm"));
+                            item.SubItems.Add(deadlineStr);
+
+                            item.Tag = task;
+                            taskListView.Items.Add(item);
+                            count++;
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine($"Ошибка при добавлении задачи в список: {ex.Message}");
+                        }
+                    }
+                }
+
+                statusLabel.Text = $"Всего задач: {count} | Последнее обновление: {DateTime.Now:HH:mm:ss}";
+                CheckDeadlineToday();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при обновлении списка задач: {ex.Message}", "Ошибка",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                taskListView.EndUpdate();
+            }
         }
 
         private void RefreshTaskList(SortKind sort)
