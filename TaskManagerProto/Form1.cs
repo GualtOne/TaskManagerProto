@@ -424,7 +424,7 @@ namespace TaskManagerProto
                 foreach (var task in tasks)
                 {
                     DateTime? deadline = task.DeadLine as DateTime?;
-                    if (deadline.Value.Day == DateTime.Now.Day + 1)
+                    if (deadline.Value.Day == DateTime.Now.Day + 1 && deadline.Value.Year == DateTime.Now.Year && deadline.Value.Month == DateTime.Now.Month)
                     {
                         try
                         {
@@ -484,7 +484,7 @@ namespace TaskManagerProto
                 foreach (var task in tasks)
                 {
                     DateTime? deadline = task.DeadLine as DateTime?;
-                    if (deadline.HasValue && deadline.Value.Day == DateTime.Now.Day)
+                    if (deadline.HasValue && deadline.Value.Day == DateTime.Now.Day && deadline.Value.Year == DateTime.Now.Year && deadline.Value.Month == DateTime.Now.Month)
                     {
                         try
                         {
@@ -781,7 +781,7 @@ namespace TaskManagerProto
                 for (int i = 0; i < taskListView.Items.Count; i++)
                 {
                     DateTime deadline = Convert.ToDateTime(taskListView.Items[i].SubItems[6].Text);
-                    if (deadline.Day == DateTime.Now.Day + 1)
+                    if (deadline.Day == DateTime.Now.Day + 1 && deadline.Year == DateTime.Now.Year && deadline.Month == DateTime.Now.Month)
                     {
                         dla.Add(taskListView.Items[i].SubItems[1].Text);
                         dlaa.Add(i);
@@ -850,7 +850,7 @@ namespace TaskManagerProto
                 for (int i = 0; i < taskListView.Items.Count; i++)
                 {
                     DateTime deadline = Convert.ToDateTime(taskListView.Items[i].SubItems[6].Text);
-                    if (deadline.Day == DateTime.Now.Day)
+                    if (deadline.Day == DateTime.Now.Day && deadline.Year == DateTime.Now.Year && deadline.Month == DateTime.Now.Month)
                     {
                         dla.Add(taskListView.Items[i].SubItems[1].Text);
                         dlaa.Add(i);
