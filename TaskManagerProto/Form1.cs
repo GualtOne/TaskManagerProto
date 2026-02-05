@@ -23,6 +23,7 @@ namespace TaskManagerProto
         private ListViewItem item;
         private ToolStripTextBox SearchBox;
 
+        
         public enum SortKind
         {
             ByID,
