@@ -1,0 +1,8 @@
+.vs/
+.vs
+.gitattributes
+TaskManagerProto_TemporaryKey.pfx
+publish/
+obj/
+bin/
+*.log
