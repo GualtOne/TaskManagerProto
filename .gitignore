@@ -1,5 +1,7 @@
 .vs/
 .vs
+..vs/
+..vs
 .gitattributes
 TaskManagerProto_TemporaryKey.pfx
 publish/
