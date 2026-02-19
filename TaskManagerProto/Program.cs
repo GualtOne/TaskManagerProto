@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace TaskManagerProto
@@ -16,7 +13,8 @@ namespace TaskManagerProto
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            DBmanager.Connection();
+            XMLmanager.Checkifexist();
+            XMLmanager.CheckifDataexists();
             Application.Run(new Form1());
         }
     }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -62,8 +61,10 @@ namespace TaskManagerProto
             MaximizeBox = false;
             MinimizeBox = false;
 
-            mainPanel = new Panel();
-            mainPanel.Dock = DockStyle.Fill;
+            mainPanel = new Panel
+            {
+                Dock = DockStyle.Fill
+            };
             Controls.Add(mainPanel);
 
             nameLabel = new Label()
@@ -210,7 +211,7 @@ namespace TaskManagerProto
 
         private void LoadData()
         {
-            var statuses = DBmanager.GetAllStatuses();
+            var statuses = XMLmanager.GetAllStatuses();
             foreach (var status in statuses)
             {
                 statusComboBox.Items.Add(status.Name);
@@ -218,7 +219,7 @@ namespace TaskManagerProto
             if (statusComboBox.Items.Count > 0)
                 statusComboBox.SelectedIndex = 0;
 
-            var types = DBmanager.GetAllTypes();
+            var types = XMLmanager.GetAllTypes();
             foreach (var type in types)
             {
                 typeComboBox.Items.Add(type.Name);
@@ -237,14 +238,14 @@ namespace TaskManagerProto
 
         private void LoadTaskData(int taskId)
         {
-            var task = DBmanager.GetTaskById(taskId);
+            var task = XMLmanager.GetTaskById(taskId);
             if (task != null)
             {
                 nameBox.Text = task.TaskName;
                 descriptionBox.Text = task.TaskDescription;
                 dateTimePicker.Value = task.DeadLine ?? DateTime.Now.AddDays(7);
 
-                var currentStatusName = DBmanager.GetTaskStatusName(Convert.ToInt32(task.StatusID));
+                var currentStatusName = XMLmanager.GetTaskStatusName(Convert.ToInt32(task.StatusID));
                 if (!string.IsNullOrEmpty(currentStatusName))
                 {
                     for (int i = 0; i < statusComboBox.Items.Count; i++)
@@ -257,7 +258,7 @@ namespace TaskManagerProto
                     }
                 }
 
-                var currentTypeName = DBmanager.GetTaskTypeName(Convert.ToInt32(task.StatusID));
+                var currentTypeName = XMLmanager.GetTaskTypeName(Convert.ToInt32(task.StatusID));
                 if (!string.IsNullOrEmpty(currentTypeName))
                 {
                     for (int i = 0; i < typeComboBox.Items.Count; i++)
@@ -345,12 +346,12 @@ namespace TaskManagerProto
 
         public int GetStatusId()
         {
-            return DBmanager.GetStatusIdByName(SelectedStatus);
+            return XMLmanager.GetStatusIdByName(SelectedStatus);
         }
 
         public int GetTypeId()
         {
-            return DBmanager.GetTypeIdByName(SelectedType);
+            return XMLmanager.GetTypeIdByName(SelectedType);
         }
 
         public Priority GetPriority()

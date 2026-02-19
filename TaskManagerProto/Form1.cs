@@ -1,15 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using Dapper;
 
 namespace TaskManagerProto
 {
@@ -272,7 +267,7 @@ namespace TaskManagerProto
                         int typeId = addForm.GetTypeId();
                         Priority priority = addForm.GetPriority();
 
-                        DBmanager.AddTask(
+                        XMLmanager.AddTask(
                             addForm.TaskName,
                             addForm.TaskDescription,
                             statusId,
@@ -306,7 +301,7 @@ namespace TaskManagerProto
                         int statusId = editForm.GetStatusId();
                         int typeId = editForm.GetTypeId();
                         Priority priority = editForm.GetPriority();
-                        DBmanager.UpdateTask(
+                        XMLmanager.UpdateTask(
                             taskId,
                             editForm.TaskName,
                             editForm.TaskDescription,
@@ -459,7 +454,7 @@ namespace TaskManagerProto
                 taskListView.BeginUpdate();
                 taskListView.Items.Clear();
 
-                var tasks = DBmanager.GetTasks();
+                var tasks = XMLmanager.GetTasks();
                 foreach (var task in tasks)
                 {
                     DateTime? deadline = task.DeadLine;
@@ -471,8 +466,8 @@ namespace TaskManagerProto
 
                             item.SubItems.Add(task.TaskName);
 
-                            string statusName = DBmanager.GetTaskStatusName(Convert.ToInt32(task.StatusID));
-                            string typeName = DBmanager.GetTaskTypeName(Convert.ToInt32(task.TypeID));
+                            string statusName = XMLmanager.GetTaskStatusName(Convert.ToInt32(task.StatusID));
+                            string typeName = XMLmanager.GetTaskTypeName(Convert.ToInt32(task.TypeID));
 
                             item.SubItems.Add(string.IsNullOrEmpty(statusName) ? "Не указан" : statusName);
                             item.SubItems.Add(string.IsNullOrEmpty(typeName) ? "Не указан" : typeName);
@@ -518,7 +513,7 @@ namespace TaskManagerProto
                 taskListView.BeginUpdate();
                 taskListView.Items.Clear();
 
-                IEnumerable<Task> tasks = DBmanager.GetTasks();
+                IEnumerable<Task> tasks = XMLmanager.GetTasks();
                 foreach (var task in tasks)
                 {
                     DateTime? deadline = task.DeadLine;
@@ -530,8 +525,8 @@ namespace TaskManagerProto
 
                             item.SubItems.Add(task.TaskName);
 
-                            string statusName = DBmanager.GetTaskStatusName(Convert.ToInt32(task.StatusID));
-                            string typeName = DBmanager.GetTaskTypeName(Convert.ToInt32(task.TypeID));
+                            string statusName = XMLmanager.GetTaskStatusName(Convert.ToInt32(task.StatusID));
+                            string typeName = XMLmanager.GetTaskTypeName(Convert.ToInt32(task.TypeID));
 
                             item.SubItems.Add(string.IsNullOrEmpty(statusName) ? "Не указан" : statusName);
                             item.SubItems.Add(string.IsNullOrEmpty(typeName) ? "Не указан" : typeName);
@@ -578,7 +573,7 @@ namespace TaskManagerProto
                 taskListView.BeginUpdate();
                 taskListView.Items.Clear();
 
-                var tasks = DBmanager.GetTasks();
+                var tasks = XMLmanager.GetTasks();
                 foreach (var task in tasks)
                 {
                     DateTime? deadline = task.DeadLine;
@@ -590,8 +585,8 @@ namespace TaskManagerProto
 
                             item.SubItems.Add(task.TaskName);
 
-                            string statusName = DBmanager.GetTaskStatusName(Convert.ToInt32(task.StatusID));
-                            string typeName = DBmanager.GetTaskTypeName(Convert.ToInt32(task.TypeID));
+                            string statusName = XMLmanager.GetTaskStatusName(Convert.ToInt32(task.StatusID));
+                            string typeName = XMLmanager.GetTaskTypeName(Convert.ToInt32(task.TypeID));
 
                             item.SubItems.Add(string.IsNullOrEmpty(statusName) ? "Не указан" : statusName);
                             item.SubItems.Add(string.IsNullOrEmpty(typeName) ? "Не указан" : typeName);
@@ -654,15 +649,15 @@ namespace TaskManagerProto
                     Sort(SortKind.ByID);
                 }
 
-                var tasks = DBmanager.GetTasks();
+                var tasks = XMLmanager.GetTasks();
                 foreach (var task in tasks)
                 {
                     try
                     {
                         item = new ListViewItem(task.ID.ToString());
                         item.SubItems.Add(task.TaskName);
-                        string statusName = DBmanager.GetTaskStatusName(Convert.ToInt32(task.StatusID));
-                        string typeName = DBmanager.GetTaskTypeName(Convert.ToInt32(task.TypeID));
+                        string statusName = XMLmanager.GetTaskStatusName(Convert.ToInt32(task.StatusID));
+                        string typeName = XMLmanager.GetTaskTypeName(Convert.ToInt32(task.TypeID));
 
                         item.SubItems.Add(string.IsNullOrEmpty(statusName) ? "Не указан" : statusName);
                         item.SubItems.Add(string.IsNullOrEmpty(typeName) ? "Не указан" : typeName);
@@ -732,7 +727,7 @@ namespace TaskManagerProto
 
                     if (result == DialogResult.Yes)
                     {
-                        DBmanager.DeleteTask(selectedTask.ID);
+                        XMLmanager.DeleteTask(selectedTask.ID);
                         RefreshTaskList();
                         MessageBox.Show($"Задача '{taskName}' успешно удалена.", "Информация",
                             MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -758,8 +753,8 @@ namespace TaskManagerProto
             {
                 try
                 {
-                    string statusName = DBmanager.GetTaskStatusName(Convert.ToInt32(selectedTask.StatusID));
-                    string typeName = DBmanager.GetTaskTypeName(Convert.ToInt32(selectedTask.TypeID));
+                    string statusName = XMLmanager.GetTaskStatusName(Convert.ToInt32(selectedTask.StatusID));
+                    string typeName = XMLmanager.GetTaskTypeName(Convert.ToInt32(selectedTask.TypeID));
 
                     string info = $"ID: {selectedTask.ID}\n" +
                                   $"Название: {selectedTask.TaskName}\n" +
@@ -798,7 +793,7 @@ namespace TaskManagerProto
         private void NextStatus()
         {
             Task selectedTask = GetSelectedTask();
-            int statuscount = DBmanager.GetAllStatuses().Count();
+            int statuscount = XMLmanager.GetAllStatuses().Count();
             if (selectedTask != null)
             {
                 int ID = selectedTask.ID;
@@ -809,11 +804,11 @@ namespace TaskManagerProto
                     {
                         if (statusID < statuscount)
                         {
-                            DBmanager.UpdateStatus(ID, statusID + 1);
+                            XMLmanager.UpdateStatus(ID, statusID + 1);
                         }
                         else if (statusID >= statuscount)
                         {
-                            DBmanager.UpdateStatus(ID, statusID - (statuscount - 1));
+                            XMLmanager.UpdateStatus(ID, statusID - (statuscount - 1));
                         }
                     }
                 }
@@ -841,13 +836,13 @@ namespace TaskManagerProto
                     switch (priority)
                     {
                         case Priority.Низкий:
-                            DBmanager.UpdatePriority(selectedTask.ID, Priority.Средний);
+                            XMLmanager.UpdatePriority(selectedTask.ID, Priority.Средний);
                             break;
                         case Priority.Средний:
-                            DBmanager.UpdatePriority(selectedTask.ID, Priority.Высокий);
+                            XMLmanager.UpdatePriority(selectedTask.ID, Priority.Высокий);
                             break;
                         case Priority.Высокий:
-                            DBmanager.UpdatePriority(selectedTask.ID, Priority.Низкий);
+                            XMLmanager.UpdatePriority(selectedTask.ID, Priority.Низкий);
                             break;
                     }
                 }
@@ -1053,7 +1048,7 @@ namespace TaskManagerProto
             {
                 try 
                 {
-                    var allTasks = DBmanager.GetTasks();
+                    var allTasks = XMLmanager.GetTasks();
                     List<ListViewItem> foundItems = new List<ListViewItem>();
 
 
@@ -1062,8 +1057,8 @@ namespace TaskManagerProto
                     foreach (var task in allTasks)
                     {
                         if (task.TaskName.IndexOf(SearchBox.Text, StringComparison.OrdinalIgnoreCase) >= 0 ||
-                            DBmanager.GetTaskStatusName(Convert.ToInt32(task.StatusID)).IndexOf(SearchBox.Text, StringComparison.OrdinalIgnoreCase) >= 0 ||
-                            DBmanager.GetTaskTypeName(Convert.ToInt32(task.TypeID)).IndexOf(SearchBox.Text, StringComparison.OrdinalIgnoreCase) >= 0 ||
+                            XMLmanager.GetTaskStatusName(Convert.ToInt32(task.StatusID)).IndexOf(SearchBox.Text, StringComparison.OrdinalIgnoreCase) >= 0 ||
+                            XMLmanager.GetTaskTypeName(Convert.ToInt32(task.TypeID)).IndexOf(SearchBox.Text, StringComparison.OrdinalIgnoreCase) >= 0 ||
                             task.Priority.ToString().IndexOf(SearchBox.Text, StringComparison.OrdinalIgnoreCase) >= 0 ||
                             task.StartDate.ToString().IndexOf(SearchBox.Text, StringComparison.OrdinalIgnoreCase) >= 0 ||
                             task.DeadLine.ToString().IndexOf(SearchBox.Text, StringComparison.OrdinalIgnoreCase) >= 0)
@@ -1071,8 +1066,8 @@ namespace TaskManagerProto
                             ListViewItem item = new ListViewItem(task.ID.ToString());
                             item.SubItems.Add(task.TaskName);
 
-                            string statusName = DBmanager.GetTaskStatusName(Convert.ToInt32(task.StatusID));
-                            string typeName = DBmanager.GetTaskTypeName(Convert.ToInt32(task.TypeID));
+                            string statusName = XMLmanager.GetTaskStatusName(Convert.ToInt32(task.StatusID));
+                            string typeName = XMLmanager.GetTaskTypeName(Convert.ToInt32(task.TypeID));
 
                             item.SubItems.Add(string.IsNullOrEmpty(statusName) ? "Не указан" : statusName);
                             item.SubItems.Add(string.IsNullOrEmpty(typeName) ? "Не указан" : typeName);
